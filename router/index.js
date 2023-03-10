@@ -1,9 +1,8 @@
 const router = require("express").Router();
-
-router.get("/test", (req, res) => {
-  res.json({ message: "hi!" });
+const Message = require("../data/Message");
+const { db } = require("../firebase/firebase-config");
+router.get("/test", async (req, res) => {
+  res.json({ message: "hi" });
 });
 
 module.exports = router;
-
-// AIzaSyCoy45XkHEzV50UXX0DOTsuSY0tzbJxZwA
