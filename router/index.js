@@ -19,6 +19,11 @@ router.post("/get-response", async (req, res) => {
       );
     //get response from chat gpt
     gptRes = await getChatCompletion([
+      {
+        content:
+          "you are a professional assistant, from now on  only answer questions in a formal way",
+        role: "user",
+      },
       ...prvMsgs,
       { content: reqMsg, role: "user" },
     ]);
