@@ -22,12 +22,4 @@ app.use(firebaseDecodeToken); //authentication
 app.use("/api", router); //init router
 /////////////////////////////////////
 
-mongoose
-  .connect("mongodb://127.0.0.1:27017/juncdb", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then((db) => {
-    // start server
-    app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
-  });
+app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

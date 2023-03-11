@@ -40,26 +40,14 @@ router.post("/get-response", async (req, res) => {
 });
 
 //get recommended articles for user based on conversation
-router.get("/get-articles", async (req, res) => {
+router.get("/get-conversation", async (req, res) => {
+  if (!req.user_id) return res.sendStatus(400); //user not authentified
   try {
-    //NOTE: don't save this conversation
-    //get previous chat messages
-    //prvMsgs = await Message.getAll(req.user_id);
-    //get response from chat gpt
-    gptRes = await getChatCompletion([
-      ...prvMsgs,
-      {
-        content:
-          "can you suggest me some interesting or helpful articles based on our conversation, but only include articles link no description or title, and put the links in an array form",
-        role: "user",
-      },
-    ]);
-    //extract the articles from response as array
-    const arrayStr = gptRes.content.match(/\[((.|\n)*)\]/);
-    // Parse the array string into an actual JavaScript array
-    const articles = JSON.parse(arrayStr[0]);
+    prvMsgs = (await Message.getAll(req.user_id)).map(
+      (msg) => new Message(msg)
+    );
 
-    res.json({ message: articles });
+    return res.json(prvMsgs);
   } catch (e) {
     res
       .status(400)
