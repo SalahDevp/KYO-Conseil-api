@@ -1,5 +1,5 @@
 const { model, Schema } = require("mongoose");
-const { db } = require("../firebase/firebase-config");
+const { db, admin } = require("../firebase/firebase-config");
 
 class Message {
   constructor({ role, content }) {
@@ -12,7 +12,11 @@ class Message {
       .collection("users")
       .doc(user_id)
       .collection("messages")
-      .add({ role: this.role, content: this.content });
+      .add({
+        role: this.role,
+        content: this.content,
+        created_at: admin.firestore.FieldValue.serverTimestamp(),
+      });
   }
 
   static async getAll(user_id) {
@@ -20,6 +24,7 @@ class Message {
       .collection("users")
       .doc(user_id)
       .collection("messages")
+      .orderBy("created_at")
       .get();
     return querySnapshot.docs.map((doc) => doc.data());
   }
