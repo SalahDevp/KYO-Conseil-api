@@ -82,7 +82,7 @@ router.get("/get-description", async (req, res) => {
   try {
     const userData = await db.collection("users").doc(req.user_id).get();
     const data = userData.data();
-    return res.json({ description: data.description });
+    return res.json({ description: data.description || "" });
   } catch (e) {
     res
       .status(400)
