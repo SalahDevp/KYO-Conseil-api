@@ -1,10 +1,11 @@
 const router = require("express").Router();
 const Message = require("../data/Message");
 const getChatCompletion = require("../gpt/gptConfig");
+const { db } = require("../firebase/firebase-config");
 
 router.get("/test", async (req, res) => {
   const msg = new Message({ role: "user", content: "bruh2" });
-  msg.save(req.user_id);
+  //msg.save(req.user_id);
   res.json({ message: "hi" });
 });
 
@@ -53,6 +54,35 @@ router.get("/get-conversation", async (req, res) => {
     );
 
     return res.json(prvMsgs);
+  } catch (e) {
+    res
+      .status(400)
+      .json({ message: "An error occurred, please try again later. " });
+  }
+});
+
+router.post("/save-description", async (req, res) => {
+  if (!req.user_id) return res.sendStatus(400); //user not authentified
+  try {
+    await db
+      .collection("users")
+      .doc(req.user_id)
+      .set({ description: req.body.description });
+
+    return res.json({ description: req.body.description });
+  } catch (e) {
+    res
+      .status(400)
+      .json({ message: "An error occurred, please try again later. " });
+  }
+});
+
+router.get("/get-description", async (req, res) => {
+  if (!req.user_id) return res.sendStatus(400); //user not authentified
+  try {
+    const userData = await db.collection("users").doc(req.user_id).get();
+    const data = userData.data();
+    return res.json({ description: data.description });
   } catch (e) {
     res
       .status(400)

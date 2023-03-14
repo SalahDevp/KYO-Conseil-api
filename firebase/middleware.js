@@ -8,9 +8,6 @@ async function decodeToken(req, res, next) {
     if (decodedValue) {
       //save user id
       req.user_id = decodedValue.user_id;
-      //if new user save to firestore
-      userDoc = await db.collection("users").doc(decodedValue.user_id);
-      if (!userDoc.exists) userDoc.set({});
       return next();
     }
     return res.json({ message: "Unauthorized" });
