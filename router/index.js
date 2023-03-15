@@ -100,7 +100,7 @@ router.get("/get-description", async (req, res) => {
   }
 });
 
-router.get("/get-smart-replies", async (req, res) => {
+router.post("/get-smart-replies", async (req, res) => {
   try {
     gptRes = await getChatCompletion([
       {
