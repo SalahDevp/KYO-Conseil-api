@@ -14,15 +14,25 @@ router.post("/get-response", async (req, res) => {
   try {
     //get previous chat messages
     prvMsgs = [];
-    if (req.user_id)
+    let description = "hi";
+    if (req.user_id) {
       prvMsgs = (await Message.getAll(req.user_id)).map(
         (msg) => new Message(msg)
       );
+      const userData = await db.collection("users").doc(req.user_id).get();
+      description = userData.data().description;
+    }
     //get response from chat gpt
     gptRes = await getChatCompletion([
       {
         content:
           "you are a professional assistant, from now on  only answer questions in a formal way",
+        role: "user",
+      },
+      {
+        content:
+          "this is a description about me, use it as a context for your next replies: " +
+          description,
         role: "user",
       },
       ...prvMsgs,
@@ -83,6 +93,31 @@ router.get("/get-description", async (req, res) => {
     const userData = await db.collection("users").doc(req.user_id).get();
     const data = userData.data();
     return res.json({ description: data.description || "" });
+  } catch (e) {
+    res
+      .status(400)
+      .json({ message: "An error occurred, please try again later. " });
+  }
+});
+
+router.get("/get-smart-replies", async (req, res) => {
+  try {
+    gptRes = await getChatCompletion([
+      {
+        content: `i received this email :
+          ${req.body.email}`,
+        role: "user",
+      },
+      {
+        content:
+          "can you generate 4 smart replies as noun phrase and in short format without any description, and put each smart replie between double quotes",
+        role: "user",
+      },
+    ]);
+    const regex = /"([^"]+)"/g;
+
+    const matches = gptRes.content.match(regex);
+    res.json(matches);
   } catch (e) {
     res
       .status(400)
